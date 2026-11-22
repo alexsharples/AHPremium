@@ -1,0 +1,15 @@
+## Interface: 16001
+## Title: AH Premium
+## Notes: Shows whether an item is worth selling on the auction house or vendoring, using Auctionator's last scan.
+## Author: Alex Sharples
+## Version: 0.1.0
+## Dependencies: Auctionator
+## OptionalDeps: Bagnon
+## SavedVariables: AHPremiumDB
+## SavedVariablesPerCharacter: AHPremiumCharDB
+
+Core.lua
+Tooltip.lua
+BagIcons.lua
+IgnoreList.lua
+Options.lua

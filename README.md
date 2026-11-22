@@ -18,3 +18,7 @@ New-Item -ItemType Junction -Path "I:\Games\World of Warcraft\_forever_\Interfac
 ```
 
 Then `/reload` in game after each change. Requires Auctionator.
+
+## Licence
+
+Copyright (c) 2026 Alex Sharples. Licensed under the GNU General Public License v3.0. See [LICENSE](LICENSE).

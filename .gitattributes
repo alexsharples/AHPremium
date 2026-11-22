@@ -1,0 +1,5 @@
+# Files left out of release zips (git archive and GitHub's source archives).
+# They stay in the repo. LICENSE stays in the zip because GPL-3.0 requires it.
+AGENTS.md       export-ignore
+README.md       export-ignore
+.gitattributes  export-ignore

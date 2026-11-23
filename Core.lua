@@ -11,6 +11,7 @@ SW.defaults = {
   showTooltip = true,
   showBagIcon = true,
   showVendorIcon = true,
+  ignoreVendorItems = true, -- skip items seen on a vendor with unlimited stock (food, water, arrows)
 }
 
 local function initDB()
@@ -20,6 +21,7 @@ local function initDB()
       AHPremiumDB[k] = v
     end
   end
+  AHPremiumDB.vendorItems = AHPremiumDB.vendorItems or {} -- [itemID] = true, learned at vendors
   SW.db = AHPremiumDB
 
   AHPremiumCharDB = AHPremiumCharDB or {}
@@ -42,6 +44,7 @@ function SW.Evaluate(link, isBound)
 
   local itemID = SW.ItemID(link)
   if itemID and SW.charDB and SW.charDB.ignored[itemID] then return nil end
+  if itemID and SW.db.ignoreVendorItems and SW.db.vendorItems[itemID] then return nil end
 
   local _, _, quality, _, _, _, _, _, _, _, sellPrice, _, _, bindType = C_Item.GetItemInfo(link)
   if sellPrice == nil then return nil end -- item info not cached yet
@@ -87,10 +90,31 @@ function SW.Evaluate(link, isBound)
   return result
 end
 
+-- Remember items a vendor always has in stock, so they can be skipped. Limited-stock
+-- and extended-cost (honour, tokens) entries are left out. Runs once per vendor window.
+local function learnVendorItems()
+  if not SW.db then return end
+  local known, changed = SW.db.vendorItems, false
+  for i = 1, GetMerchantNumItems() do
+    local _, _, _, _, numAvailable, _, extendedCost = GetMerchantItemInfo(i)
+    if numAvailable == -1 and not extendedCost then
+      local id = SW.ItemID(GetMerchantItemLink(i))
+      if id and not known[id] then
+        known[id] = true
+        changed = true
+      end
+    end
+  end
+  if changed and SW.RefreshBags then SW.RefreshBags() end
+end
+
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
-frame:SetScript("OnEvent", function(_, _, name)
-  if name == ADDON then
+frame:RegisterEvent("MERCHANT_SHOW")
+frame:SetScript("OnEvent", function(_, event, name)
+  if event == "MERCHANT_SHOW" then
+    learnVendorItems()
+  elseif name == ADDON then
     initDB()
     frame:UnregisterEvent("ADDON_LOADED")
   end

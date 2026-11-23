@@ -15,11 +15,11 @@ local function getIcon(button, kind)
     icon:SetTexture("Interface/Icons/INV_Misc_Coin_01")
     icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
     icon:SetSize(14, 14)
+    -- Same corner for both: a slot gets the gold coin or the grey one, never both.
+    -- Bottom right would cover the stack count; Scrap uses TOPLEFT.
+    icon:SetPoint("TOPRIGHT", -2, -2)
     if kind == "vendor" then
       icon:SetDesaturated(true) -- grey coin: safe to vendor
-      icon:SetPoint("BOTTOMRIGHT", -2, 2)
-    else
-      icon:SetPoint("TOPRIGHT", -2, -2) -- Scrap uses TOPLEFT
     end
     set[kind] = icon
   end

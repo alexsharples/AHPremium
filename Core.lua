@@ -96,7 +96,14 @@ local function learnVendorItems()
   if not SW.db then return end
   local known, changed = SW.db.vendorItems, false
   for i = 1, GetMerchantNumItems() do
-    local _, _, _, _, numAvailable, _, extendedCost = GetMerchantItemInfo(i)
+    local numAvailable, extendedCost
+    if C_MerchantFrame and C_MerchantFrame.GetItemInfo then
+      local info = C_MerchantFrame.GetItemInfo(i)
+      if info then numAvailable, extendedCost = info.numAvailable, info.hasExtendedCost end
+    elseif GetMerchantItemInfo then
+      local _
+      _, _, _, _, numAvailable, _, extendedCost = GetMerchantItemInfo(i)
+    end
     if numAvailable == -1 and not extendedCost then
       local id = SW.ItemID(GetMerchantItemLink(i))
       if id and not known[id] then

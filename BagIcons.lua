@@ -2,29 +2,47 @@ local _, SW = ...
 
 local icons = {}
 
-local function getIcon(button)
-  local icon = icons[button]
+-- icons[button] = { coin = texture, vendor = texture }, each made on first use.
+local function getIcon(button, kind)
+  local set = icons[button]
+  if not set then
+    set = {}
+    icons[button] = set
+  end
+  local icon = set[kind]
   if not icon then
     icon = button:CreateTexture(nil, "OVERLAY")
     icon:SetTexture("Interface/Icons/INV_Misc_Coin_01")
     icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
     icon:SetSize(14, 14)
-    icon:SetPoint("TOPRIGHT", -2, -2) -- Scrap uses TOPLEFT
-    icons[button] = icon
+    if kind == "vendor" then
+      icon:SetDesaturated(true) -- grey coin: safe to vendor
+      icon:SetPoint("BOTTOMRIGHT", -2, 2)
+    else
+      icon:SetPoint("TOPRIGHT", -2, -2) -- Scrap uses TOPLEFT
+    end
+    set[kind] = icon
   end
   return icon
 end
 
+local function showIcon(button, kind, show)
+  if show or (icons[button] and icons[button][kind]) then
+    getIcon(button, kind):SetShown(show)
+  end
+end
+
 local function setIcon(button, link, isBound)
-  local show = false
-  if link and SW.db and SW.db.showBagIcon then
+  local coin, vendor = false, false
+  if link and SW.db and (SW.db.showBagIcon or SW.db.showVendorIcon) then
     local r = SW.Evaluate(link, isBound)
-    show = r ~= nil and (r.verdict == "ah" or r.verdict == "ahonly")
-    if show and r.stale then show = false end
+    if r and not r.stale then
+      coin = SW.db.showBagIcon and (r.verdict == "ah" or r.verdict == "ahonly")
+      vendor = SW.db.showVendorIcon and r.verdict == "vendor"
+    end
   end
-  if show or icons[button] then
-    getIcon(button):SetShown(show)
-  end
+  showIcon(button, "coin", coin)
+  showIcon(button, "vendor", vendor)
 end
 
 --[[ Blizzard bags ]]--

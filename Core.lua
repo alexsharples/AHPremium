@@ -10,6 +10,7 @@ SW.defaults = {
   includeJunk = false, -- grey (poor quality) items are skipped unless this is on
   showTooltip = true,
   showBagIcon = true,
+  showVendorIcon = true,
 }
 
 local function initDB()

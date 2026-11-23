@@ -33,6 +33,7 @@ local function register()
     1, 21, 1, "%d")
   addCheckbox("showTooltip", "Show tooltip line", "Add the AH Premium verdict to item tooltips.")
   addCheckbox("showBagIcon", "Show bag icon", "Mark items worth selling on the AH in your bags.")
+  addCheckbox("showVendorIcon", "Show vendor icon", "Mark items that are better vendored than sold on the AH with a grey coin.")
   addCheckbox("includeJunk", "Include junk (grey) items", "Off by default. Grey items are skipped unless this is on.")
 
   -- Kept separate so a missing button API doesn't break the rest of the panel.

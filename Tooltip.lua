@@ -28,12 +28,12 @@ local function addLines(tooltip, data)
   if not data then return end
 
   -- Bag tooltips often carry no hyperlink, so look the item up by bag and slot.
-  local link, bound
+  local link, bound, count
   local info = tooltip.processingInfo or tooltip.info
   if info and info.getterName == "GetBagItem" and info.getterArgs then
     local bag, slot = unpack(info.getterArgs)
     local ci = C_Container.GetContainerItemInfo(bag, slot)
-    if ci then link, bound = ci.hyperlink, ci.isBound end
+    if ci then link, bound, count = ci.hyperlink, ci.isBound, ci.stackCount end
   end
   link = link or data.hyperlink or (data.id and select(2, C_Item.GetItemInfo(data.id)))
   if not link then return end
@@ -64,6 +64,11 @@ local function addLines(tooltip, data)
   tooltip:AddLine(text, cr, cg, cb)
   if r.ahNet then
     tooltip:AddDoubleLine("  AH after cut / vendor", money(r.ahNet) .. " / " .. money(r.vendorPrice), 0.7, 0.7, 0.7, 1, 1, 1)
+    -- Display-only multiplication of the per-item figures, so it stays out of SW.Evaluate.
+    if count and count > 1 then
+      tooltip:AddDoubleLine("  Stack x" .. count .. ": AH after cut / vendor",
+        money(r.ahNet * count) .. " / " .. money(r.vendorPrice * count), 0.7, 0.7, 0.7, 1, 1, 1)
+    end
   end
   tooltip:Show() -- resize to fit the new lines
 end

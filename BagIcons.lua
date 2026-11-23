@@ -106,6 +106,7 @@ end
 local loader = CreateFrame("Frame")
 loader:RegisterEvent("PLAYER_LOGIN")
 loader:RegisterEvent("BAG_UPDATE_DELAYED")
+loader:RegisterEvent("AUCTION_HOUSE_CLOSED") -- a scan changes prices without moving any item
 loader:SetScript("OnEvent", function(_, event)
   if event == "PLAYER_LOGIN" then
     if _G.Bagnon and _G.Bagnon.Item and _G.Bagnon.Item.Update then

@@ -2,10 +2,27 @@
 
 How to work in this repo. Read AGENTS.md first: it covers the addon's rules (lightweight, Auctionator API, saved variables, release zips). This file covers the workflow around them.
 
+## Approach
+
+1. **Don't assume. Raise confusion and tradeoffs.** When something is unclear or there are competing approaches, say so. Name the tradeoff, give a recommendation, and wait for direction.
+2. **Minimum code that solves the problem.** No speculative features, premature abstractions or future-proofing.
+3. **Touch only what you must.** Don't clean up adjacent code, rename things you didn't break, or restructure areas you weren't asked to touch.
+4. **Define success criteria, then loop until verified.** Before non-trivial work, state what "done" looks like, and check against it before calling the work complete.
+
+## Writing
+
+- Australian English everywhere: "colour", "organise", "behaviour", "licence" as a noun.
+- Write docs, PR descriptions, release notes and comments like a person, not a language model:
+  - Use em dashes sparingly. Prefer a full stop, a comma, or a rewrite.
+  - Avoid stock phrases: "real power", "wake-up call", "key takeaway", "it's worth noting", "at the end of the day", "game-changer", "robust", "seamless", "leverage" (as a verb), "navigate" or "landscape" (metaphorical), "dive deep", "unpack", "elevate", "empower", "delve", "moreover", "furthermore", "additionally".
+  - No "Here's the thing:" openers, habitual lists of three, or summaries that repeat what was just said.
+  - Vary sentence length, and say things directly in plain words ("use", not "utilise").
+  - When editing someone else's text, keep its facts, tone and length.
+
 ## Branches
 
 - Never commit to `main` directly. Every change goes on a branch off `main` and reaches `main` through a PR, including docs, version bumps and one-line fixes. The default branch is `main`; there is no `master`.
-- Before starting, `git fetch --prune` and make sure `main` is current.
+- Before reading code to answer a question or starting work, `git fetch --prune` and check the local branch isn't behind its remote (in PowerShell, `git rev-list --count 'HEAD..@{u}'`). If it is, pull before drawing any conclusions.
 - Once a branch is merged, delete it locally and on the remote in the same step as the merge: `gh pr merge <n> --merge --delete-branch`, or `git branch -d <name>` and `git push origin --delete <name>`. Then `git fetch --prune`.
 - Don't leave dangling branches. If `git branch --merged main` lists anything besides `main`, delete it.
 

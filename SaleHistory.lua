@@ -19,7 +19,7 @@ function SW.SaleHistory(itemName, ahPrice)
 
   local chance = sold / (sold + failed)
   local okM, maxSold = pcall(api.GetRealmMaxSoldByItemName, SW.callerID, itemName)
-  if okM and maxSold and ahPrice and ahPrice > maxSold then
+  if okM and maxSold and maxSold > 0 and ahPrice and ahPrice > maxSold then
     chance = chance * maxSold / ahPrice
   end
   return { chance = chance, sold = sold, failed = failed }

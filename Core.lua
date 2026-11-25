@@ -47,7 +47,8 @@ local function smeltOver(result, bar, sellPrice)
   local pct = sellPrice > 0 and bar.net / sellPrice - 1 or nil
   if pct and pct < SW.db.thresholdPct / 100 then return end
   if bar.limit then
-    result.rest = { verdict = result.verdict, pct = result.pct, smeltBar = result.smeltBar, stale = result.stale }
+    result.rest = { verdict = result.verdict, pct = result.pct, smeltBar = result.smeltBar, stale = result.stale,
+      saleChance = result.saleChance }
   end
   result.verdict, result.smeltBar, result.pct, result.stale = "smelt", bar, pct, false
 end
@@ -58,7 +59,7 @@ end
 --   pct: ahNet / vendorPrice - 1, or the best bar's for "smelt" (nil when vendorPrice is 0)
 --   stale: true when the AH price is older than staleDays
 --   smelt: bar prices for ores the player can smelt; smeltBar: the best, when verdict is "smelt"
---   rest: { verdict, pct, smeltBar, stale } for ore left over when smeltBar.limit caps an alloy
+--   rest: { verdict, pct, smeltBar, stale, saleChance } for ore left over when smeltBar.limit caps an alloy
 --   saleChance, sold, failed: from Journalator's sale history, when it was used
 -- notInBags: how many of the item are on show outside the bags (a loot slot), so
 -- alloy advice is capped against them too.
@@ -111,6 +112,8 @@ function SW.Evaluate(link, isBound, notInBags)
       if h.chance < SW.db.minSaleRatePct / 100 then
         local holds = result.verdict == "ahonly" or h.chance * result.ahNet >= sellPrice
         result.verdict = holds and "hold" or "vendor"
+        -- Vendoring because it won't sell: show the expected AH return, not the list price.
+        if not holds then result.pct = h.chance * result.ahNet / sellPrice - 1 end
       end
     end
   end

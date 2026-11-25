@@ -30,8 +30,18 @@ How to work in this repo. Read AGENTS.md first: it covers the addon's rules (lig
 
 - PowerShell 5.1 mangles quotes in here-strings passed to `git commit -m`. Write the message to a file in the scratchpad and use `git commit -F <file>`. Do the same for PR bodies with `gh pr create --body-file`.
 - Keep the PR description in step with the branch. If later commits change the scope, update it with `gh pr edit <n> --body-file`.
-- Run `/code-review` on the PR before merging, and list what was fixed and what was left.
 - The PR description has a testing checklist. Tick only what was run in game.
+
+## Reviews
+
+- Every PR is reviewed before it's merged, including docs-only and one-line changes.
+- An agent reviewing a PR (for example with `/code-review`) posts a comment on it with `gh pr comment <n> --body-file <file>`. The comment:
+  - confirms the review was done, naming the commit SHA reviewed and how it was reviewed
+  - lists each finding with its file and line and the change requested, most severe first, or says there were none
+  - marks which findings block the merge
+- Fixes go on the same branch as new commits. After pushing them, review again and post a follow-up comment saying what was fixed, and what was left and why.
+- Don't merge while a blocking finding is open, unless the user has said to accept it. Record that in a PR comment.
+- GitHub won't let the PR's author approve it, and the agent posts as the user's account, so the comment is the review record, not an approval.
 
 ## Verifying
 

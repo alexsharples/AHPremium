@@ -16,7 +16,7 @@ AH Premium is a small World of Warcraft: Forever addon. It reads Auctionator's l
 
 ```
 AHPremium.toc   load order, Interface number, saved variables
-Core.lua        defaults, saved-variable init, SW.Evaluate (the one place the verdict is decided)
+Core.lua        defaults, saved-variable init, SW.Evaluate and its smeltOver helper (the one place the verdict is decided)
 Smelting.lua    ore and alloy recipes, SW.SmeltPrices (bar values SW.Evaluate weighs)
 Tooltip.lua     item tooltip line (TooltipDataProcessor post-call)
 BagIcons.lua    bag slot coin (Bagnon and default bags)
@@ -24,7 +24,7 @@ IgnoreList.lua  window that lists and removes ignored items
 Options.lua     Settings panel and /ahp slash commands
 ```
 
-`SW.Evaluate` is shared by the tooltip and the bag icons. Change the verdict logic there, not in the display files.
+`SW.Evaluate` is shared by the tooltip and the bag icons. Change the verdict logic in Core.lua (`SW.Evaluate`, or `smeltOver` for when smelting wins), not in the display files.
 
 ## Rules that are easy to break
 

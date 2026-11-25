@@ -9,6 +9,7 @@ SW.defaults = {
   staleDays = 1,
   includeJunk = false, -- grey (poor quality) items are skipped unless this is on
   showTooltip = true,
+  showPriceBreakdown = false, -- price lines under the tooltip verdict
   showBagIcon = true,
   showVendorIcon = true,
   ignoreVendorItems = true, -- skip items seen on a vendor with unlimited stock (food, water, arrows)

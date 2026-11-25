@@ -42,7 +42,9 @@ end
 --   stale: true when the AH price is older than staleDays
 --   smelt: bar prices for ores the player can smelt; smeltBar: the best, when verdict is "smelt"
 --   rest: { verdict, pct, smeltBar, stale } for ore left over when smeltBar.limit caps an alloy
-function SW.Evaluate(link, isBound)
+-- notInBags: how many of the item are on show outside the bags (a loot slot), so
+-- alloy advice is capped against them too.
+function SW.Evaluate(link, isBound, notInBags)
   if not link then return nil end
 
   local itemID = SW.ItemID(link)
@@ -96,7 +98,7 @@ function SW.Evaluate(link, isBound)
     result.verdict, result.smeltBar, result.pct, result.stale = "smelt", bar, pct, false
   end
 
-  result.smelt = SW.SmeltPrices(itemID)
+  result.smelt = SW.SmeltPrices(itemID, notInBags)
   local full, capped
   for _, bar in ipairs(result.smelt or {}) do
     if bar.limit then

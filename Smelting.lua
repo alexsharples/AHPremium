@@ -31,14 +31,16 @@ local function knows(spellID)
 end
 
 -- AH price after cut, or nil when there is none or it is stale, so old bar
--- prices can't drive a smelt recommendation.
-local function freshAHNet(itemID)
+-- prices can't drive a smelt recommendation. anyAge keeps stale prices.
+local function freshAHNet(itemID, anyAge)
   local api = Auctionator and Auctionator.API and Auctionator.API.v1
   if not api then return nil end
   local ok, price = pcall(api.GetAuctionPriceByItemID, SW.callerID, itemID)
   if not ok or not price then return nil end
-  local okAge, age = pcall(api.GetAuctionAgeByItemID, SW.callerID, itemID)
-  if not okAge or age == nil or age > SW.db.staleDays then return nil end
+  if not anyAge then
+    local okAge, age = pcall(api.GetAuctionAgeByItemID, SW.callerID, itemID)
+    if not okAge or age == nil or age > SW.db.staleDays then return nil end
+  end
   return price * (1 - SW.AH_CUT)
 end
 
@@ -54,18 +56,20 @@ local function partnerCount(id)
   return n
 end
 
--- The best the partner would fetch on its own, as itself or as its ore.
+-- The best the partner would fetch on its own, as itself or as its ore. Stale prices
+-- count here: dropping them would undervalue the partner and flatter the alloy.
 local function partnerValue(id)
-  local value = math.max(freshAHNet(id) or 0, vendorPrice(id))
+  local value = math.max(freshAHNet(id, true) or 0, vendorPrice(id))
   local ore = oreForBar[id]
-  if ore then value = math.max(value, freshAHNet(ore) or 0, vendorPrice(ore)) end
+  if ore then value = math.max(value, freshAHNet(ore, true) or 0, vendorPrice(ore)) end
   return value
 end
 
 -- Per-ore value after the AH cut for each bar the player can actually make. An alloy
--- short of partners for every ore in the bags carries `limit`, the ore it can take.
+-- short of partners for every ore carries `limit`, the ore it can take. notInBags is
+-- ore the player is about to have but isn't in the bags yet, such as a loot slot.
 -- Called from SW.Evaluate; returns nil for anything that isn't a smeltable ore.
-function SW.SmeltPrices(itemID)
+function SW.SmeltPrices(itemID, notInBags)
   local r = itemID and oreRecipes[itemID]
   if not r or not knows(r.spell) then return nil end
   local prices = {}
@@ -75,6 +79,7 @@ function SW.SmeltPrices(itemID)
   end
 
   local ores = r.ores or 1
+  local oreCount = C_Item.GetItemCount(itemID) + (notInBags or 0)
   local barNet = freshAHNet(r.bar)
   add(r.name, barNet and barNet / ores, ores > 1 and (r.name .. " after cut, per ore") or nil)
 
@@ -88,7 +93,7 @@ function SW.SmeltPrices(itemID)
       if alloyNet then
         add(a.name .. " (with " .. partner[2] .. ")", (a.yield * alloyNet - partnerValue(partner[1])) / ores,
           a.name .. " after cut, less the " .. partner[2],
-          partners < C_Item.GetItemCount(itemID) and partners or nil)
+          partners < oreCount and partners or nil)
       end
     end
   end

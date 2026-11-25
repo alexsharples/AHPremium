@@ -58,17 +58,20 @@ local function addLines(tooltip, data)
   if not data then return end
 
   -- Bag tooltips often carry no hyperlink, so look the item up by bag and slot.
-  local link, bound, count
+  local link, bound, count, notInBags
   local info = tooltip.processingInfo or tooltip.info
   if info and info.getterName == "GetBagItem" and info.getterArgs then
     local bag, slot = unpack(info.getterArgs)
     local ci = C_Container.GetContainerItemInfo(bag, slot)
     if ci then link, bound, count = ci.hyperlink, ci.isBound, ci.stackCount end
+  elseif info and info.getterName == "GetLootItem" and info.getterArgs then
+    -- Loot isn't in the bags yet, so tell Evaluate how much is coming.
+    notInBags = select(3, GetLootSlotInfo(info.getterArgs[1]))
   end
   link = link or data.hyperlink or (data.id and select(2, C_Item.GetItemInfo(data.id)))
   if not link then return end
 
-  local r = SW.Evaluate(link, bound or tooltipSaysBound(data))
+  local r = SW.Evaluate(link, bound or tooltipSaysBound(data), notInBags)
   if not r then return end
 
   tooltip:AddLine(verdictLine("AH Premium: ", r))

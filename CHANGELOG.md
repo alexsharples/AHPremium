@@ -4,6 +4,8 @@ Changes to the AH Premium addon, newest first.
 
 ## Unreleased
 
+## 1.2.1 (2026-11-25)
+
 - Bag refreshes do a little less work when checking smelting advice. No visible change.
 
 ## 1.2.0 (2026-11-25)

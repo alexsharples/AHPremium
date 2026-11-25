@@ -1,11 +1,10 @@
 # Changelog
 
-Changes to AH Premium, newest first. Each PR adds a line under Unreleased; a release moves those lines under its version.
+Changes to the AH Premium addon, newest first.
 
 ## Unreleased
 
 - Bag refreshes do a little less work when checking smelting advice. No visible change.
-- Development: added CLAUDE.md with the repo workflow, required a review and a changelog entry on every PR, and brought the README and AGENTS.md up to date.
 
 ## 1.2.0 (2026-11-25)
 

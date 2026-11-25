@@ -31,7 +31,7 @@ How to work in this repo. Read AGENTS.md first: it covers the addon's rules (lig
 - PowerShell 5.1 mangles quotes in here-strings passed to `git commit -m`. Write the message to a file in the scratchpad and use `git commit -F <file>`. Do the same for PR bodies with `gh pr create --body-file`.
 - Keep the PR description in step with the branch. If later commits change the scope, update it with `gh pr edit <n> --body-file`.
 - The PR description has a testing checklist. Tick only what was run in game.
-- Every PR adds a line to the Unreleased section of `CHANGELOG.md`. Write player-facing changes for players. Prefix changes players won't see (docs, workflow) with "Development:".
+- `CHANGELOG.md` covers the addon only: changes to files that ship in the release zip and so need a new tag and release (the `.lua` and `.toc` files). A PR that changes them adds a line to the Unreleased section, written for players. PRs that only change docs or workflow (AGENTS.md, CLAUDE.md, README.md, `.gitattributes`) don't add one.
 
 ## Reviews
 
@@ -41,7 +41,7 @@ How to work in this repo. Read AGENTS.md first: it covers the addon's rules (lig
   - lists each finding with its file and line and the change requested, most severe first, or says there were none
   - marks which findings block the merge
 - A finding blocks the merge if it's a correctness bug the PR adds or makes worse, or the PR breaks a rule in AGENTS.md or CLAUDE.md. Nits never block.
-- A PR that changes code (any `.lua` or `.toc` file) without a `CHANGELOG.md` entry is blocked. A docs-only PR missing one gets a non-blocking finding.
+- A PR that changes a `.lua` or `.toc` file without a `CHANGELOG.md` entry is blocked. The version-bump PR is the exception: moving Unreleased under the new version counts as its entry.
 - **Standing exception to "ask before anything outward-facing":** when the user asks for a PR to be reviewed, posting the review comment and its follow-ups needs no further approval. Pushing fixes, merging and everything else outward-facing still needs the user's go-ahead each time.
 - Fixes go on the same branch as new commits. After pushing them, review again and post a follow-up comment saying what was fixed, and what was left and why.
 - Don't merge while a blocking finding is open, unless the user has said to accept it. If they do, the agent posts a PR comment naming the finding and quoting the user's acceptance.
@@ -55,8 +55,15 @@ How to work in this repo. Read AGENTS.md first: it covers the addon's rules (lig
 
 ## Releases
 
+- Versions follow semantic versioning, `MAJOR.MINOR.PATCH`, always three parts. Tags are `v` plus the version (`v1.2.1`). For this addon:
+  - **MAJOR:** players lose something or must act. Examples: a setting or slash command removed, saved variables reset or migrated, a new required dependency.
+  - **MINOR:** something new or changed that players will notice, such as a feature, a setting, a new verdict, or a change to existing advice.
+  - **PATCH:** bug fixes and changes with no visible effect.
+- Pick the version from the largest change in Unreleased. A PR that changes a `.lua` or `.toc` file says in its description whether it's a major, minor or patch change.
+- Pre-releases of a version not yet released use a `-alpha.N` or `-beta.N` suffix (`v1.3.0-beta.1`). An untested build of a finished version keeps its plain number and is published as a GitHub pre-release instead.
+- Older tags (`v1.0`, `v1.1`) predate this rule. Leave them as they are; never move or rename a published tag.
 - Follow the release steps in AGENTS.md: bump `## Version:` in the TOC on the branch before merging, tag the merge commit, build the zip from the tag with `git archive`.
 - Publish untested builds as GitHub pre-releases. Mark one Latest only after the user confirms it works in game.
-- On the version-bump branch, move the Unreleased lines in `CHANGELOG.md` under a `## <version> (<date>)` heading and leave Unreleased empty.
-- Release notes are for players: take that version's changelog lines, leave out "Development:" ones, and add the Auctionator requirement and install line. Match the style of earlier releases.
+- On the version-bump branch, move the Unreleased lines in `CHANGELOG.md` under a `## <version> (<date>)` heading and leave Unreleased empty. The date is the day the tag is created; correct it before merging if the merge slips to a later day.
+- Release notes are for players: take that version's changelog lines, and add the Auctionator requirement and install line. Match the style of earlier releases.
 - New dev-only files (like this one) go in `.gitattributes` as `export-ignore` so they stay out of the zip.

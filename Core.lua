@@ -36,10 +36,12 @@ function SW.ItemID(link)
 end
 
 -- Returns a table, or nil when there is nothing worth showing.
---   verdict: "ah", "vendor", "ahonly", "nodata"
+--   verdict: "ah", "vendor", "smelt", "ahonly", "nodata"
 --   ahPrice / vendorPrice: per item, copper. ahNet is ahPrice after the AH cut.
---   pct: ahNet / vendorPrice - 1 (nil when vendorPrice is 0)
+--   pct: ahNet / vendorPrice - 1, or the best bar's for "smelt" (nil when vendorPrice is 0)
 --   stale: true when the AH price is older than staleDays
+--   smelt: bar prices for ores the player can smelt; smeltBar: the best, when verdict is "smelt"
+--   rest: { verdict, pct, smeltBar, stale } for ore left over when smeltBar.limit caps an alloy
 function SW.Evaluate(link, isBound)
   if not link then return nil end
 
@@ -66,28 +68,47 @@ function SW.Evaluate(link, isBound)
   end
 
   local result = { vendorPrice = sellPrice, ahPrice = ahPrice }
-
-  if not ahPrice then
-    if sellPrice == 0 then return nil end
+  if ahPrice then
+    -- Auctionator returns nil for age when the last sighting was over 21 days ago.
+    result.stale = (age == nil) or (age > SW.db.staleDays)
+    result.ahNet = ahPrice * (1 - SW.AH_CUT)
+    if sellPrice == 0 then
+      result.verdict = "ahonly"
+    else
+      result.pct = result.ahNet / sellPrice - 1
+      result.verdict = result.pct >= SW.db.thresholdPct / 100 and "ah" or "vendor"
+    end
+  elseif sellPrice > 0 then
     result.verdict = "nodata"
-    return result
   end
 
-  -- Auctionator returns nil for age when the last sighting was over 21 days ago.
-  result.stale = (age == nil) or (age > SW.db.staleDays)
-  result.ahNet = ahPrice * (1 - SW.AH_CUT)
-
-  if sellPrice == 0 then
-    result.verdict = "ahonly"
-    return result
+  -- A bar replaces the verdict when it beats the ore on the AH (and any bar already
+  -- chosen) and clears the vendor threshold. Bar prices are already fresh, so the
+  -- verdict isn't stale. A capped alloy goes last and keeps the verdict it replaced
+  -- as `rest`, for the ore it has no partner for.
+  local function smeltOver(bar)
+    if not bar or bar.net <= math.max(result.ahNet or 0, result.smeltBar and result.smeltBar.net or 0) then return end
+    local pct = sellPrice > 0 and bar.net / sellPrice - 1 or nil
+    if pct and pct < SW.db.thresholdPct / 100 then return end
+    if bar.limit then
+      result.rest = { verdict = result.verdict, pct = result.pct, smeltBar = result.smeltBar, stale = result.stale }
+    end
+    result.verdict, result.smeltBar, result.pct, result.stale = "smelt", bar, pct, false
   end
 
-  result.pct = result.ahNet / sellPrice - 1
-  if result.pct >= SW.db.thresholdPct / 100 then
-    result.verdict = "ah"
-  else
-    result.verdict = "vendor"
+  result.smelt = SW.SmeltPrices(itemID)
+  local full, capped
+  for _, bar in ipairs(result.smelt or {}) do
+    if bar.limit then
+      if not capped or bar.net > capped.net then capped = bar end
+    elseif not full or bar.net > full.net then
+      full = bar
+    end
   end
+  smeltOver(full)
+  smeltOver(capped)
+
+  if not result.verdict then return nil end
   return result
 end
 
@@ -103,7 +124,7 @@ local function learnVendorItems()
       if info then numAvailable, extendedCost = info.numAvailable, info.hasExtendedCost end
     elseif GetMerchantItemInfo then
       local _
-      _, _, _, _, numAvailable, _, extendedCost = GetMerchantItemInfo(i)
+      _, _, _, _, numAvailable, _, _, extendedCost = GetMerchantItemInfo(i)
     end
     if numAvailable == -1 and not extendedCost then
       local id = SW.ItemID(GetMerchantItemLink(i))

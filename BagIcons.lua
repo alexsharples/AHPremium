@@ -37,7 +37,7 @@ local function setIcon(button, link, isBound)
   if link and SW.db and (SW.db.showBagIcon or SW.db.showVendorIcon) then
     local r = SW.Evaluate(link, isBound)
     if r and not r.stale then
-      coin = SW.db.showBagIcon and (r.verdict == "ah" or r.verdict == "ahonly")
+      coin = SW.db.showBagIcon and (r.verdict == "ah" or r.verdict == "smelt" or r.verdict == "ahonly")
       vendor = SW.db.showVendorIcon and r.verdict == "vendor"
     end
   end

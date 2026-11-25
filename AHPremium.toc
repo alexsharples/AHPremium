@@ -11,6 +11,7 @@
 ## SavedVariablesPerCharacter: AHPremiumCharDB
 
 Core.lua
+Smelting.lua
 Tooltip.lua
 BagIcons.lua
 IgnoreList.lua

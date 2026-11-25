@@ -33,6 +33,9 @@ local function verdictLine(prefix, v)
   elseif v.verdict == "ah" then
     text = string.format("sell on AH (+%d%% over vendor)", v.pct * 100 + 0.5)
     cr, cg, cb = 0.2, 1, 0.2
+  elseif v.verdict == "hold" then
+    text = "hold, list later"
+    cr, cg, cb = 1, 0.6, 0.1
   elseif v.verdict == "vendor" then
     text = string.format("vendor it (AH %+d%%)", v.pct * 100 + (v.pct < 0 and -0.5 or 0.5))
     cr, cg, cb = 1, 0.82, 0.2
@@ -42,6 +45,11 @@ local function verdictLine(prefix, v)
   else
     text = "no AH data"
     cr, cg, cb = 0.6, 0.6, 0.6
+  end
+
+  -- The chance is for this item, so it doesn't apply once a bar is being sold instead.
+  if v.saleChance and v.verdict ~= "smelt" then
+    text = string.format("%s, sells %d%%", text, v.saleChance * 100 + 0.5)
   end
 
   if v.stale and v.verdict ~= "nodata" then
@@ -89,6 +97,9 @@ local function addLines(tooltip, data)
       tooltip:AddDoubleLine("  Stack x" .. count .. ": AH after cut / vendor",
         money(r.ahNet * count) .. " / " .. money(r.vendorPrice * count), 0.7, 0.7, 0.7, 1, 1, 1)
     end
+  end
+  if r.sold then
+    tooltip:AddDoubleLine("  Your sales: sold / failed", r.sold .. " / " .. r.failed, 0.7, 0.7, 0.7, 1, 1, 1)
   end
   for _, p in ipairs(r.smelt or {}) do
     tooltip:AddDoubleLine("  Smelted: " .. p.label, money(p.net), 0.7, 0.7, 0.7, 1, 1, 1)

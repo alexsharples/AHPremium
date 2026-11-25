@@ -6,12 +6,13 @@
 ## Version: 1.2.1
 ## Category: Auctions
 ## Dependencies: Auctionator
-## OptionalDeps: Bagnon
+## OptionalDeps: Bagnon, Journalator, Journalator_Statistics
 ## SavedVariables: AHPremiumDB
 ## SavedVariablesPerCharacter: AHPremiumCharDB
 
 Core.lua
 Smelting.lua
+SaleHistory.lua
 Tooltip.lua
 BagIcons.lua
 IgnoreList.lua

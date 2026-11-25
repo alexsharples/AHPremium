@@ -13,6 +13,8 @@ SW.defaults = {
   showBagIcon = true,
   showVendorIcon = true,
   ignoreVendorItems = true, -- skip items seen on a vendor with unlimited stock (food, water, arrows)
+  useSaleHistory = true, -- weigh Journalator's sale history when it's installed
+  minSaleRatePct = 50, -- below this chance of selling, an AH item becomes hold or vendor
 }
 
 local function initDB()
@@ -51,12 +53,13 @@ local function smeltOver(result, bar, sellPrice)
 end
 
 -- Returns a table, or nil when there is nothing worth showing.
---   verdict: "ah", "vendor", "smelt", "ahonly", "nodata"
+--   verdict: "ah", "hold", "vendor", "smelt", "ahonly", "nodata"
 --   ahPrice / vendorPrice: per item, copper. ahNet is ahPrice after the AH cut.
 --   pct: ahNet / vendorPrice - 1, or the best bar's for "smelt" (nil when vendorPrice is 0)
 --   stale: true when the AH price is older than staleDays
 --   smelt: bar prices for ores the player can smelt; smeltBar: the best, when verdict is "smelt"
 --   rest: { verdict, pct, smeltBar, stale } for ore left over when smeltBar.limit caps an alloy
+--   saleChance, sold, failed: from Journalator's sale history, when it was used
 -- notInBags: how many of the item are on show outside the bags (a loot slot), so
 -- alloy advice is capped against them too.
 function SW.Evaluate(link, isBound, notInBags)
@@ -66,7 +69,7 @@ function SW.Evaluate(link, isBound, notInBags)
   if itemID and SW.charDB and SW.charDB.ignored[itemID] then return nil end
   if itemID and SW.db.ignoreVendorItems and SW.db.vendorItems[itemID] then return nil end
 
-  local _, _, quality, _, _, _, _, _, _, _, sellPrice, _, _, bindType = C_Item.GetItemInfo(link)
+  local name, _, quality, _, _, _, _, _, _, _, sellPrice, _, _, bindType = C_Item.GetItemInfo(link)
   if sellPrice == nil then return nil end -- item info not cached yet
 
   if quality == 0 and not SW.db.includeJunk then return nil end
@@ -97,6 +100,19 @@ function SW.Evaluate(link, isBound, notInBags)
     end
   elseif sellPrice > 0 then
     result.verdict = "nodata"
+  end
+
+  -- An AH verdict only stands if the item tends to sell. Below the cut-off, hold it
+  -- while the expected return (chance x AH price) still beats the vendor, else vendor.
+  if SW.db.useSaleHistory and (result.verdict == "ah" or result.verdict == "ahonly") then
+    local h = SW.SaleHistory(name, ahPrice)
+    if h then
+      result.saleChance, result.sold, result.failed = h.chance, h.sold, h.failed
+      if h.chance < SW.db.minSaleRatePct / 100 then
+        local holds = result.verdict == "ahonly" or h.chance * result.ahNet >= sellPrice
+        result.verdict = holds and "hold" or "vendor"
+      end
+    end
   end
 
   result.smelt = SW.SmeltPrices(itemID, notInBags)

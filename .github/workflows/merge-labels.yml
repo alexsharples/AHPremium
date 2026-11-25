@@ -1,0 +1,19 @@
+# Fails while a PR carries the blocked or do-not-merge label.
+# The main ruleset requires this check, so those labels stop a merge.
+name: Merge labels
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, labeled, unlabeled]
+
+permissions: {}
+
+jobs:
+  merge-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for blocked or do-not-merge
+        if: contains(github.event.pull_request.labels.*.name, 'blocked') || contains(github.event.pull_request.labels.*.name, 'do-not-merge')
+        run: |
+          echo "::error::This PR has the blocked or do-not-merge label. Remove it before merging."
+          exit 1

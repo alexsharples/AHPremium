@@ -21,7 +21,7 @@ How to work in this repo. Read AGENTS.md first: it covers the addon's rules (lig
 
 ## Branches
 
-- Never commit to `main` directly. Every change goes on a branch off `main` and reaches `main` through a PR, including docs, version bumps and one-line fixes. The default branch is `main`; there is no `master`.
+- Never commit to `main` directly. Every change goes on a branch off `main` and reaches `main` through a PR, including docs, version bumps and one-line fixes. The `Protect main` ruleset enforces this, along with merge commits only and no force pushes or deletion. A second ruleset stops `v*` tags being moved or deleted. The default branch is `main`; there is no `master`.
 - Before reading code to answer a question or starting work, `git fetch --prune` and check the local branch isn't behind its remote (in PowerShell, `git rev-list --count 'HEAD..@{u}'`). If it is, pull before drawing any conclusions.
 - Once a branch is merged, delete it locally and on the remote in the same step as the merge: `gh pr merge <n> --merge --delete-branch`, or `git branch -d <name>` and `git push origin --delete <name>`. Then `git fetch --prune`.
 - Don't leave dangling branches. If `git branch --merged main` lists anything besides `main`, delete it.
@@ -42,7 +42,7 @@ How to work in this repo. Read AGENTS.md first: it covers the addon's rules (lig
   - marks which findings block the merge
 - A finding blocks the merge if it's a correctness bug the PR adds or makes worse, or the PR breaks a rule in AGENTS.md or CLAUDE.md. Nits never block.
 - A PR that changes the addon's code or assets without a `CHANGELOG.md` entry is blocked, unless the code changes are comment-only. The version-bump PR is the exception: moving Unreleased under the new version counts as its entry.
-- **Labels** gate merges by convention. GitHub doesn't enforce them, so the merge button still works; they only hold because they're checked before every merge:
+- **Labels** gate merges. The `merge-labels` check (`.github/workflows/merge-labels.yml`) fails while either label is on the PR, and the `main` ruleset requires it to pass. Admins can still bypass the ruleset on a PR, and the agent runs as an admin, so never merge with `--admin` or a bypass unless the user says to:
   - `blocked`: the PR has an open blocking finding. The reviewing agent adds it when its comment lists a blocking finding (`gh pr edit <n> --add-label blocked`), and removes it only once no blocking finding is left open, each one either fixed (confirmed by a follow-up review) or accepted by the user.
   - `do-not-merge`: the PR may be reviewed and clean, but isn't ready yet, for example while it waits for an in-game test or another PR. Added when the user asks for it, and removed only when the user says the PR is ready.
 - **Before merging**, check both (`gh pr view <n> --json labels,headRefOid`):

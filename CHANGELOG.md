@@ -4,6 +4,8 @@ Changes to the AH Premium addon, newest first.
 
 ## Unreleased
 
+- Optional Journalator support. If you have Journalator installed, AH Premium checks how often you've sold an item before telling you to list it. Items that rarely sell, or are priced above anything you've sold them for, get "hold, list later" or "vendor it" instead, and the tooltip shows your chance of selling. Needs at least 3 past listings of the item. New settings: "Use Journalator sale history" and "Minimum sale rate" (default 50%). Hold items get no bag coin.
+
 ## 1.2.1 (2026-11-25)
 
 - Bag refreshes do a little less work when checking smelting advice. No visible change.

@@ -18,6 +18,7 @@ AH Premium is a small World of Warcraft: Forever addon. It reads Auctionator's l
 AHPremium.toc   load order, Interface number, saved variables
 Core.lua        defaults, saved-variable init, SW.Evaluate and its smeltOver helper (the one place the verdict is decided)
 Smelting.lua    ore and alloy recipes, SW.SmeltPrices (bar values SW.Evaluate weighs)
+SaleHistory.lua optional Journalator sale history, SW.SaleHistory (chance of selling)
 Tooltip.lua     item tooltip line (TooltipDataProcessor post-call)
 BagIcons.lua    bag slot coin (Bagnon and default bags)
 IgnoreList.lua  window that lists and removes ignored items
@@ -30,6 +31,7 @@ Options.lua     Settings panel and /ahp slash commands
 
 - **Interface number is `16001`** (the Forever client). Retail's `120105` makes the client hide the addon as out of date.
 - **Auctionator is a hard dependency.** Use only `Auctionator.API.v1.*`, called through `pcall`, with `"AHPremium"` as the caller ID. Don't read its internal tables.
+- **Journalator is optional.** Use only `Journalator.API.v1.*`, called through `pcall` with `"AHPremium"`, and never read its saved variables. Everything must work the same without it, and without its Statistics module (the base addon's API functions are stubs).
 - **Saved variables:** `AHPremiumDB` (account) and `AHPremiumCharDB` (per character, holds `ignored[itemID]`). Renaming either wipes users' settings, so don't without a migration.
 - **Defaults live in one place:** `SW.defaults` in `Core.lua`. Don't repeat a default elsewhere.
 - **Auctionator ages are whole calendar days**, not hours. Don't add hour-based settings without our own timestamps.

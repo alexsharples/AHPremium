@@ -38,6 +38,11 @@ local function register()
   addCheckbox("showVendorIcon", "Show vendor icon", "Mark items that are better vendored than sold on the AH with a grey coin.")
   addCheckbox("ignoreVendorItems", "Ignore vendor-bought items",
     "Skip items you have seen sold in unlimited supply by a vendor, such as food, water and arrows. AH Premium learns them as you open vendor windows.")
+  addCheckbox("useSaleHistory", "Use Journalator sale history",
+    "If Journalator is installed, use how often you've sold an item to choose between selling, holding it to list later, or vendoring. Needs at least 3 past listings.")
+  addSlider("minSaleRatePct", "Minimum sale rate",
+    "Below this chance of selling, AH Premium says to hold or vendor an item instead of listing it.",
+    0, 100, 5, "%d%%")
   addCheckbox("includeJunk", "Include junk (grey) items", "Off by default. Grey items are skipped unless this is on.")
 
   -- Kept separate so a missing button API doesn't break the rest of the panel.

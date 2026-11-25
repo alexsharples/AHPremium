@@ -6,6 +6,7 @@ A World of Warcraft: Forever addon that works with Auctionator. It compares an i
 - A gold coin on the top right of bag slots worth selling on the AH, and a grey coin on ones better vendored. Works with Bagnon and the default bags.
 - Ore gets smelting advice when its bars sell for more, for recipes your character knows. Bronze and Steel are suggested when you carry the other half, and the advice is split if you have more ore than partners.
 - Items a vendor always has in stock, such as food, water and arrows, are skipped once you've seen them at a vendor.
+- With [Journalator](https://www.curseforge.com/wow/addons/journalator) installed, AH Premium checks how often you've sold an item before telling you to list it. If it rarely sells, the advice changes to "hold, list later" or "vendor it", with your sale rate shown. Needs at least 3 past listings, and can be turned off with "Use Journalator sale history".
 - Soulbound and bind-on-pickup items are ignored.
 - Prices older than the stale limit are dimmed and get no bag icon.
 

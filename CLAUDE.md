@@ -31,6 +31,7 @@ How to work in this repo. Read AGENTS.md first: it covers the addon's rules (lig
 - PowerShell 5.1 mangles quotes in here-strings passed to `git commit -m`. Write the message to a file in the scratchpad and use `git commit -F <file>`. Do the same for PR bodies with `gh pr create --body-file`.
 - Keep the PR description in step with the branch. If later commits change the scope, update it with `gh pr edit <n> --body-file`.
 - The PR description has a testing checklist. Tick only what was run in game.
+- Every PR adds a line to the Unreleased section of `CHANGELOG.md`. Write player-facing changes for players. Prefix changes players won't see (docs, workflow) with "Development:".
 
 ## Reviews
 
@@ -40,6 +41,7 @@ How to work in this repo. Read AGENTS.md first: it covers the addon's rules (lig
   - lists each finding with its file and line and the change requested, most severe first, or says there were none
   - marks which findings block the merge
 - A finding blocks the merge if it's a correctness bug the PR adds or makes worse, or the PR breaks a rule in AGENTS.md or CLAUDE.md. Nits never block.
+- A PR that changes code (any `.lua` or `.toc` file) without a `CHANGELOG.md` entry is blocked. A docs-only PR missing one gets a non-blocking finding.
 - **Standing exception to "ask before anything outward-facing":** when the user asks for a PR to be reviewed, posting the review comment and its follow-ups needs no further approval. Pushing fixes, merging and everything else outward-facing still needs the user's go-ahead each time.
 - Fixes go on the same branch as new commits. After pushing them, review again and post a follow-up comment saying what was fixed, and what was left and why.
 - Don't merge while a blocking finding is open, unless the user has said to accept it. If they do, the agent posts a PR comment naming the finding and quoting the user's acceptance.
@@ -55,5 +57,6 @@ How to work in this repo. Read AGENTS.md first: it covers the addon's rules (lig
 
 - Follow the release steps in AGENTS.md: bump `## Version:` in the TOC on the branch before merging, tag the merge commit, build the zip from the tag with `git archive`.
 - Publish untested builds as GitHub pre-releases. Mark one Latest only after the user confirms it works in game.
-- Release notes are for players: what changed for them, plus the Auctionator requirement and install line. Match the style of earlier releases.
+- On the version-bump branch, move the Unreleased lines in `CHANGELOG.md` under a `## <version> (<date>)` heading and leave Unreleased empty.
+- Release notes are for players: take that version's changelog lines, leave out "Development:" ones, and add the Auctionator requirement and install line. Match the style of earlier releases.
 - New dev-only files (like this one) go in `.gitattributes` as `export-ignore` so they stay out of the zip.

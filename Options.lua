@@ -32,8 +32,12 @@ local function register()
     "AH prices last seen longer ago than this are marked stale and get no bag icon.",
     1, 21, 1, "%d")
   addCheckbox("showTooltip", "Show tooltip line", "Add the AH Premium verdict to item tooltips.")
+  addCheckbox("showPriceBreakdown", "Show price breakdown",
+    "Show the AH, vendor, stack and smelted prices under the tooltip line.")
   addCheckbox("showBagIcon", "Show bag icon", "Mark items worth selling on the AH in your bags.")
   addCheckbox("showVendorIcon", "Show vendor icon", "Mark items that are better vendored than sold on the AH with a grey coin.")
+  addCheckbox("ignoreVendorItems", "Ignore vendor-bought items",
+    "Skip items you have seen sold in unlimited supply by a vendor, such as food, water and arrows. AH Premium learns them as you open vendor windows.")
   addCheckbox("includeJunk", "Include junk (grey) items", "Off by default. Grey items are skipped unless this is on.")
 
   -- Kept separate so a missing button API doesn't break the rest of the panel.

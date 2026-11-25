@@ -3,7 +3,7 @@
 ## Notes: Shows whether an item is worth selling on the auction house or vendoring, using Auctionator's last scan.
 ## Author: Alex Sharples
 ## X-License: GPL-3.0
-## Version: 1.2.0-alpha1
+## Version: 1.2.0
 ## Category: Auctions
 ## Dependencies: Auctionator
 ## OptionalDeps: Bagnon

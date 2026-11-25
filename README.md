@@ -2,12 +2,14 @@
 
 A World of Warcraft: Forever addon that works with Auctionator. It compares an item's last-scanned AH price (after the 5% AH cut) with its vendor price and tells you which is the better sale.
 
-- Tooltip line: "sell on AH (+X% over vendor)", "vendor it", or "no AH data".
-- A small coin on the top right of bag slots worth selling on the AH. Works with Bagnon and the default bags.
+- Tooltip line: "sell on AH (+X% over vendor)", "vendor it", "smelt to …, sell on AH", or "no AH data".
+- A gold coin on the top right of bag slots worth selling on the AH, and a grey coin on ones better vendored. Works with Bagnon and the default bags.
+- Ore gets smelting advice when its bars sell for more, for recipes your character knows. Bronze and Steel are suggested when you carry the other half, and the advice is split if you have more ore than partners.
+- Items a vendor always has in stock, such as food, water and arrows, are skipped once you've seen them at a vendor.
 - Soulbound and bind-on-pickup items are ignored.
 - Prices older than the stale limit are dimmed and get no bag icon.
 
-Settings: `/ahp` or Esc > Options > AddOns > AH Premium. The default premium is 10%.
+Settings: `/ahp` or Esc > Options > AddOns > AH Premium. Turn on "Show price breakdown" to see the AH, vendor and smelted prices under the tooltip line. `/ahp list` shows the items you've ignored.
 
 ## Requirements
 

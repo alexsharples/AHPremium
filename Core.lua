@@ -35,6 +35,21 @@ function SW.ItemID(link)
   return id and tonumber(id)
 end
 
+-- A bar replaces the verdict when it beats the ore on the AH (and any bar already
+-- chosen) and clears the vendor threshold. Bar prices are already fresh, so the
+-- verdict isn't stale. A capped alloy goes last and keeps the verdict it replaced
+-- as `rest`, for the ore it has no partner for. Kept outside SW.Evaluate so bag
+-- refreshes don't create a closure per slot.
+local function smeltOver(result, bar, sellPrice)
+  if not bar or bar.net <= math.max(result.ahNet or 0, result.smeltBar and result.smeltBar.net or 0) then return end
+  local pct = sellPrice > 0 and bar.net / sellPrice - 1 or nil
+  if pct and pct < SW.db.thresholdPct / 100 then return end
+  if bar.limit then
+    result.rest = { verdict = result.verdict, pct = result.pct, smeltBar = result.smeltBar, stale = result.stale }
+  end
+  result.verdict, result.smeltBar, result.pct, result.stale = "smelt", bar, pct, false
+end
+
 -- Returns a table, or nil when there is nothing worth showing.
 --   verdict: "ah", "vendor", "smelt", "ahonly", "nodata"
 --   ahPrice / vendorPrice: per item, copper. ahNet is ahPrice after the AH cut.
@@ -84,20 +99,6 @@ function SW.Evaluate(link, isBound, notInBags)
     result.verdict = "nodata"
   end
 
-  -- A bar replaces the verdict when it beats the ore on the AH (and any bar already
-  -- chosen) and clears the vendor threshold. Bar prices are already fresh, so the
-  -- verdict isn't stale. A capped alloy goes last and keeps the verdict it replaced
-  -- as `rest`, for the ore it has no partner for.
-  local function smeltOver(bar)
-    if not bar or bar.net <= math.max(result.ahNet or 0, result.smeltBar and result.smeltBar.net or 0) then return end
-    local pct = sellPrice > 0 and bar.net / sellPrice - 1 or nil
-    if pct and pct < SW.db.thresholdPct / 100 then return end
-    if bar.limit then
-      result.rest = { verdict = result.verdict, pct = result.pct, smeltBar = result.smeltBar, stale = result.stale }
-    end
-    result.verdict, result.smeltBar, result.pct, result.stale = "smelt", bar, pct, false
-  end
-
   result.smelt = SW.SmeltPrices(itemID, notInBags)
   local full, capped
   for _, bar in ipairs(result.smelt or {}) do
@@ -107,8 +108,8 @@ function SW.Evaluate(link, isBound, notInBags)
       full = bar
     end
   end
-  smeltOver(full)
-  smeltOver(capped)
+  smeltOver(result, full, sellPrice)
+  smeltOver(result, capped, sellPrice)
 
   if not result.verdict then return nil end
   return result

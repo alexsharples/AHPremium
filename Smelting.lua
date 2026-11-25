@@ -3,6 +3,7 @@ local _, SW = ...
 -- Classic smelting recipes, keyed by ore. Each ore makes one bar, except Dark Iron,
 -- which takes eight. Spells are the Smelt recipes, used to check the player knows them.
 -- Elementium is left out: its ore is bind on pickup.
+-- The item and spell IDs here were written from memory and are unverified in game.
 local oreRecipes = {
   [2770]  = { spell = 2657,  bar = 2840,  name = "Copper Bar" },
   [2771]  = { spell = 3304,  bar = 3576,  name = "Tin Bar" },

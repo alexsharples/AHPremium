@@ -55,7 +55,7 @@ Say what was and wasn't verified. Don't claim a check passed if it was only read
 ## Git, releases and safety
 
 - **Ask before anything outward-facing:** pushing, tagging, creating releases, or touching the user's WoW folder. Approval for one doesn't cover the next.
-- Commits: imperative subject, a short body saying why, plus the attribution trailer the harness specifies. On PowerShell, pass multi-line messages with `git commit -m @'...'@` (single-quoted here-string).
+- Commits: imperative subject, a short body saying why, plus the attribution trailer the harness specifies. On PowerShell 5.1, write the message to a file and use `git commit -F <file>`. Passing a here-string to `git commit -m` breaks when the message contains quotes.
 - The game folder holds a **junction** to this repo at `...\_forever_\Interface\AddOns\AHPremium`. Remove it with `rmdir` on the link, never a recursive delete.
 - Releases are tags named `v<version>` (for example `v1.0`), with a zip built from the committed tag: `git archive --format=zip --prefix=AHPremium/ -o AHPremium-<version>.zip v<version>`. Bump `## Version:` in the TOC first. `.gitattributes` marks `AGENTS.md`, `README.md` and itself as `export-ignore`, so they stay out of the zip. Always build it with `git archive` (not by zipping the folder), and add any new dev-only file to `.gitattributes`.
 - Licence is GPL-3.0. Don't add code with an incompatible licence.

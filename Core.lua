@@ -43,7 +43,9 @@ end
 -- as `rest`, for the ore it has no partner for. Kept outside SW.Evaluate so bag
 -- refreshes don't create a closure per slot.
 local function smeltOver(result, bar, sellPrice)
-  if not bar or bar.net <= math.max(result.ahNet or 0, result.smeltBar and result.smeltBar.net or 0) then return end
+  -- Ore that rarely sells is compared on its expected return, not its list price.
+  local oreNet = result.expectedNet or result.ahNet or 0
+  if not bar or bar.net <= math.max(oreNet, result.smeltBar and result.smeltBar.net or 0) then return end
   local pct = sellPrice > 0 and bar.net / sellPrice - 1 or nil
   if pct and pct < SW.db.thresholdPct / 100 then return end
   if bar.limit then
@@ -61,6 +63,7 @@ end
 --   smelt: bar prices for ores the player can smelt; smeltBar: the best, when verdict is "smelt"
 --   rest: { verdict, pct, smeltBar, stale, saleChance } for ore left over when smeltBar.limit caps an alloy
 --   saleChance, sold, failed: from Journalator's sale history, when it was used
+--   expectedNet: saleChance x ahNet, set when a low sale chance changed the verdict
 -- notInBags: how many of the item are on show outside the bags (a loot slot), so
 -- alloy advice is capped against them too.
 function SW.Evaluate(link, isBound, notInBags)
@@ -110,10 +113,11 @@ function SW.Evaluate(link, isBound, notInBags)
     if h then
       result.saleChance, result.sold, result.failed = h.chance, h.sold, h.failed
       if h.chance < SW.db.minSaleRatePct / 100 then
-        local holds = result.verdict == "ahonly" or h.chance * result.ahNet >= sellPrice
+        result.expectedNet = h.chance * result.ahNet
+        local holds = result.verdict == "ahonly" or result.expectedNet >= sellPrice
         result.verdict = holds and "hold" or "vendor"
         -- Vendoring because it won't sell: show the expected AH return, not the list price.
-        if not holds then result.pct = h.chance * result.ahNet / sellPrice - 1 end
+        if not holds then result.pct = result.expectedNet / sellPrice - 1 end
       end
     end
   end

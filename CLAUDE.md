@@ -42,9 +42,17 @@ How to work in this repo. Read AGENTS.md first: it covers the addon's rules (lig
   - marks which findings block the merge
 - A finding blocks the merge if it's a correctness bug the PR adds or makes worse, or the PR breaks a rule in AGENTS.md or CLAUDE.md. Nits never block.
 - A PR that changes the addon's code or assets without a `CHANGELOG.md` entry is blocked, unless the code changes are comment-only. The version-bump PR is the exception: moving Unreleased under the new version counts as its entry.
-- **Standing exception to "ask before anything outward-facing":** when the user asks for a PR to be reviewed, posting the review comment and its follow-ups needs no further approval. Pushing fixes, merging and everything else outward-facing still needs the user's go-ahead each time.
+- **Labels** gate merges by convention. GitHub doesn't enforce them, so the merge button still works; they only hold because they're checked before every merge:
+  - `blocked`: the PR has an open blocking finding. The reviewing agent adds it when its comment lists a blocking finding (`gh pr edit <n> --add-label blocked`), and removes it only once no blocking finding is left open, each one either fixed (confirmed by a follow-up review) or accepted by the user.
+  - `do-not-merge`: the PR may be reviewed and clean, but isn't ready yet, for example while it waits for an in-game test or another PR. Added when the user asks for it, and removed only when the user says the PR is ready.
+- **Before merging**, check both (`gh pr view <n> --json labels,headRefOid`):
+  - the PR has no `blocked` or `do-not-merge` label
+  - a review comment names the current head SHA, so the latest commit has been reviewed. No label doesn't mean reviewed.
+
+  If either fails, don't merge; tell the user what's in the way.
+- **Standing exception to "ask before anything outward-facing":** when the user asks for a PR to be reviewed, posting the review comment and its follow-ups, and adding or removing the `blocked` label to match, needs no further approval. Pushing fixes, merging, `do-not-merge` and everything else outward-facing still needs the user's go-ahead each time.
 - Fixes go on the same branch as new commits. After pushing them, review again and post a follow-up comment saying what was fixed, and what was left and why.
-- Don't merge while a blocking finding is open, unless the user has said to accept it. If they do, the agent posts a PR comment naming the finding and quoting the user's acceptance.
+- Don't merge while a blocking finding is open, unless the user has said to accept it. If they do, the agent posts a PR comment naming the finding and quoting the user's acceptance. It removes the `blocked` label only if that leaves no blocking finding open.
 - GitHub won't let the PR's author approve it, and the agent posts as the user's account, so the comment is the review record, not an approval.
 
 ## Verifying

@@ -42,7 +42,7 @@ How to work in this repo. Read AGENTS.md first: it covers the addon's rules (lig
   - marks which findings block the merge
 - A finding blocks the merge if it's a correctness bug the PR adds or makes worse, or the PR breaks a rule in AGENTS.md or CLAUDE.md. Nits never block.
 - A PR that changes the addon's code or assets without a `CHANGELOG.md` entry is blocked, unless the code changes are comment-only. The version-bump PR is the exception: moving Unreleased under the new version counts as its entry.
-- **Labels** gate merges. The `merge-labels` check (`.github/workflows/merge-labels.yml`) fails while either label is on the PR, and the `main` ruleset requires it to pass. Admins can still bypass the ruleset on a PR, and the agent runs as an admin, so never merge with `--admin` or a bypass unless the user says to:
+- **Labels** gate merges. The `merge-labels` check (`.github/workflows/merge-labels.yml`) fails while either label is on the PR, and the `main` ruleset requires it to pass. Nobody can bypass the ruleset, admins included. If it ever has to be skipped, the user switches it off in the repo settings:
   - `blocked`: the PR has an open blocking finding. The reviewing agent adds it when its comment lists a blocking finding (`gh pr edit <n> --add-label blocked`), and removes it only once no blocking finding is left open, each one either fixed (confirmed by a follow-up review) or accepted by the user.
   - `do-not-merge`: the PR may be reviewed and clean, but isn't ready yet, for example while it waits for an in-game test or another PR. Added when the user asks for it, and removed only when the user says the PR is ready.
 - **Before merging**, check both (`gh pr view <n> --json labels,headRefOid`):
